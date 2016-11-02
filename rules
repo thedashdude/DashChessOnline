@@ -1,0 +1,30 @@
+Group of three things, separated by spaces:
+whenhowdistance
+
+WHEN:
+1 anytime
+2 move
+3 capture
+4 even friendlies can be captured!
+
+HOW:
+(
+u up
+d down
+l left
+r right
+) these work differently because they are unit-moving and are all considered at once.
+o up/down/left/right orthagonaly
+b diagonal (bishop)
+j jump (takes another number)
+
+Distance:
+0 any distance
+digits are the number in question
+
+king: "1o1 1b1"
+queen: "1o0 1b0"
+night: "1j12"
+rook: "1o0"
+bishop: "1b0"
+pawn: "2u0 3ur0 3ul0"
