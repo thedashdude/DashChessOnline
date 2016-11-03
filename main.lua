@@ -153,6 +153,9 @@ function love.load()
 	print(str)
 	board = unpack2D(str)
 	text = ""
+
+
+	udpTimeout = 0
 end
 
 
@@ -607,6 +610,11 @@ end
 function love.update(dt)
 	if gamemode == 1 and not first then
 		game.update(dt)
+		udpTimeout = udpTimeout + dt
+		if udpTimeout > 0.75 then
+			sendMove("phages of dunes")
+			udpTimeout = 0
+		end
 		get = udp:receive()
 		if get ~= nil and not isItMyTurn() and get~= "phages of dunes" and #get <= cols*rows + 2 then
 			text = get
