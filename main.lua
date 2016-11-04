@@ -1,4 +1,6 @@
-
+---------------------------------------------
+--DashChessOnline: GitHub *Special* Edition--
+---------------------------------------------
 
 function love.load()
 	offx = 10
@@ -67,6 +69,7 @@ function love.load()
 	buttons = require("buttons")
 	buttons2 = clone(buttons)
 	buttons3 = clone(buttons)
+	buttonsIPEDIT = clone(buttons)
 
 	buttons:add("Free Move",size*cols + size,size*rows/2+54,nil,28,toggleFreemode)
 	buttons3:add("Sync",size*cols + size+100,size*rows/2+54,nil,28,sync)
@@ -95,7 +98,7 @@ function love.load()
 	--[[range:2220-2224]]
 	serverSlot = 2222
 	--serverIP = assert(socket.dns.toip("localhost"))
-	serverIP = "192.168.1.79"
+	--serverIP = "192.168.1.79"
 	serverIP = "99.101.45.203"
 	--serverIP = "99.101.45.203"
 	targetIP = "wtf"
@@ -143,9 +146,11 @@ function love.load()
 	end
 	buttons2:add("WHITE (server)",100,100,nil,28,whiteFunc)
 	buttons2:add("BLACK (client)",100,129,nil,28,blackFunc)
+	buttons2:add("EDIT HOST IP  ",100,129+29,nil,28,function()gamemode = 3 end)
 
 
-	gamemode = 0 -- 0 for choose team, 1 for game.
+
+	gamemode = 0 -- 0 for choose team, 1 for game. 3 for IP change
 	onlineInfo = {}
 
 	dap2 = assert(socket.dns.toip("localhost"))
@@ -156,9 +161,36 @@ function love.load()
 
 
 	udpTimeout = 0
+
+
+
+	gamemode = 0
+	buttonsIPEDIT:add("DONE",100,300,nil,28,function( ... ) 
+		gamemode = 0
+		serverIP = EnterIPTable[1] .. "." .. EnterIPTable[2] .. "." .. EnterIPTable[3] ..  "." .. EnterIPTable[4]
+	end)
+	EnterIPPart = 1
+	EnterIPTable = {"99","101","45","203"}
 end
-
-
+input = {}
+function input.keypressed(key)
+	if key == "right" then
+		EnterIPPart = math.min(EnterIPPart+1,4)
+	elseif key == "left" then
+		EnterIPPart = math.max((EnterIPPart-1),1)
+	end
+end
+function love.textinput(t)
+    if gamemode == 3 then
+    	if #EnterIPTable[EnterIPPart] >= 3 and #t >= 1 then
+    		EnterIPTable[EnterIPPart] = ""
+    	end
+    	EnterIPTable[EnterIPPart] = EnterIPTable[EnterIPPart] .. t
+    	if #EnterIPTable[EnterIPPart] == 3 then
+    		EnterIPPart = math.min(EnterIPPart + 1,4)
+    	end
+    end
+end
 
 game = {}
 function game.update(dt)
@@ -504,6 +536,9 @@ function love.keypressed( key, scancode, isrepeat )
 	if key == "left"  then t = t - 1 end
 	if t > tMax then t = tMax end
 	if t < tMin then t = tMin end
+	if gamemode == 3 then
+		input.keypressed(key)
+	end
 end
 function definePieces()
 	pieces = {}
@@ -631,6 +666,9 @@ function love.update(dt)
 				print("rejiiztr'd")
 			end
 		end
+		if get == "phages of dunes" then
+			--print("phages of dunes")
+		end
 		if get ~= nil and #get >= cols*rows + 2 then
 			getSunc(get)
 		end
@@ -656,6 +694,18 @@ function love.draw()
 	end
 	if gamemode == 0 then
 		buttons2:draw()
+		love.graphics.setColor(155,155,155)
+		love.graphics.print(serverIP,100,160+32)
+	end
+	if gamemode == 3 then
+		buttonsIPEDIT:draw()
+
+		love.graphics.setColor(155,155,155)
+		for i = 1, 4 do
+			love.graphics.print(EnterIPTable[i],100+i*32-32,160+32)
+		end
+		love.graphics.print("   .   .   .   ",100,160+32)
+		love.graphics.rectangle("line",100+EnterIPPart*32-32 - 2.5, 160+32 - 2.5, 32-6, 18)
 	end
 
 end
@@ -668,6 +718,11 @@ function love.mousepressed( x, y, button, istouch )
 	if gamemode == 0 then
 		if button == 1 then
 			buttons2:update()
+		end
+	end
+	if gamemode == 3 then
+		if button == 1 then
+			buttonsIPEDIT:update()
 		end
 	end
 end
